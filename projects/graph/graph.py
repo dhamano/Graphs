@@ -145,7 +145,7 @@ class Graph:
                 # CHECK IF IT'S THE TARGET
                 if v == destination_vertex:
                     # IF SO, RETURN PATH
-                    return p
+                    return list(p)
                 # Mark it as visited...
                 visited.add(v)
                 # Then add A PATH to its neighbors to the back of the queue
@@ -167,17 +167,15 @@ class Graph:
         while s.size() > 0:
             p = s.pop()
             v = p[len(p)-1]
-            print(f"v: {v}")
             while v not in visited:
-                print(f"{v} not in {visited}")
                 if v == destination_vertex:
-                    return p
+                    return list(p)
                 visited.add(v)
                 for neighbor in self.vertices[v]:
                     cp = p + (neighbor,)
                     s.push(cp)
 
-    def dfs_recursive(self, starting_vertex):
+    def dfs_recursive(self, starting_vertex, destination_vertex):
         """
         Return a list containing a path from
         starting_vertex to destination_vertex in
@@ -186,26 +184,38 @@ class Graph:
         This should be done using recursion.
         """
         s = Stack()
-        s.push(starting_vertex)
+        s.push((starting_vertex,))
+        path_found = False
         visited = set()
 
-        def dft_rec(s, v):
-            if v not in visited:
-                print(v)
-                visited.add(v)
+        def dft_rec(s, v, p):
+            nonlocal path_found
+            if v == destination_vertex or path_found:
+                path_found = True
+                return p
             else:
-                return
-            for neighbor in self.vertices[v]:
-                s.push(neighbor)
-            if s.size() > 0:
-                while s.size() > 0:
-                    v = s.pop()
-                    if v is not None:
-                        dft_rec(s, v)
-            return
+                if v not in visited:
+                    visited.add(v)
+                else:
+                    return None
+                for neighbor in self.vertices[v]:
+                    cp = p + (neighbor,)
+                    s.push(cp)
+                if s.size() > 0:
+                    while s.size() > 0:
+                        p = s.pop()
+                        v = p[len(p)-1]
+                        if v is not None:
+                            return dft_rec(s, v, p)
+            return None
 
-        v = s.pop()
-        dft_rec(s, v)
+        p = s.pop()
+        v = p[len(p)-1]
+        result = dft_rec(s, v, p)
+        if result is None:
+            return None
+        else:
+            return list(result)
 
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph
@@ -232,7 +242,7 @@ if __name__ == '__main__':
     Should print:
         {1: {2}, 2: {3, 4}, 3: {5}, 4: {6, 7}, 5: {3}, 6: {3}, 7: {1, 6}}
     '''
-    # print(graph.vertices)
+    print(graph.vertices)
 
     '''
     Valid BFT paths:
@@ -249,7 +259,7 @@ if __name__ == '__main__':
         1, 2, 4, 3, 7, 6, 5
         1, 2, 4, 3, 7, 5, 6
     '''
-    # graph.bft(1)
+    graph.bft(1)
 
     '''
     Valid DFT paths:
@@ -258,14 +268,14 @@ if __name__ == '__main__':
         1, 2, 4, 7, 6, 3, 5
         1, 2, 4, 6, 3, 5, 7
     '''
-    # graph.dft(1)
-    # graph.dft_recursive(1)
+    graph.dft(1)
+    graph.dft_recursive(1)
 
     '''
     Valid BFS path:
         [1, 2, 4, 6]
     '''
-    # print(graph.bfs(1, 6))
+    print(graph.bfs(1, 6))
 
     '''
     Valid DFS paths:
@@ -273,4 +283,4 @@ if __name__ == '__main__':
         [1, 2, 4, 7, 6]
     '''
     print(graph.dfs(1, 6))
-    # print(graph.dfs_recursive(1, 6))
+    print(graph.dfs_recursive(1, 6))
