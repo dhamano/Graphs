@@ -104,11 +104,11 @@ class SocialGraph:
 
         # Create a list with all possible friendship combinations,
         possible_friendships = []
-        # print("possible_friendships",possible_friendships)
+        print("possible_friendships",possible_friendships)
         for user_id in self.users:
-            for friend_id in range(user_id + 1, self.last_id +1):
+            for friend_id in range(user_id + 1, self.last_id + 1):
                 possible_friendships.append( (user_id, friend_id) )
-        # print("\n~~~~\npossible_friendships",possible_friendships)
+        print("\n~~~~\npossible_friendships",possible_friendships)
         
         # print(possible_friendships)
         # print(len(possible_friendships))
