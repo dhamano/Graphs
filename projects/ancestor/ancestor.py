@@ -15,8 +15,6 @@ def earliest_ancestor(ancestors, starting_node):
 	for item in ancestors:
 		if item[0] in nodes_temp and item[1] in nodes_temp:
 			nodes[item[0]].add(item[1])
-			# nodes[item[1]].add(item[0])
-	# print(nodes)
 
 	q = Queue()
 	q.enqueue( [starting_node] )
@@ -41,7 +39,7 @@ def earliest_ancestor(ancestors, starting_node):
 	if len(routes) > 0:
 		longest_route = max(routes, key=len)
 		long_route_length = len(longest_route)
-	else :
+	else:
 		return -1
 
 	new_routes = list(filter(lambda arr: len(arr) == long_route_length, routes))
