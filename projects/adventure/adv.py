@@ -24,7 +24,102 @@ player = Player("Name", world.startingRoom)
 # Fill this out
 traversalPath = []
 
+def get_directions(new_rooms, dir=False):
+    rev_dir = { "n":"s", "s":"n", "w":"e", "e":"w" }
+    exists = False
+    rm_exits = player.currentRoom.getExits()
+    new_additions = []
+    for direction in reversed(rm_exits):
+        if direction != dir:
+            new_additions.append(direction)
+        else:
+            exists = True
+    if dir:
+        rev_dir_index = new_additions.index(rev_dir[dir])
+        new_additions.pop(rev_dir_index)
+        new_additions.insert(0,rev_dir[dir])
+    if exists:
+        new_additions.append(dir)
+    new_rooms += new_additions
+    # print(f"/// {get_rm_coord()} | DIRECTIONS: {new_rooms}")
+    # print("CURRENT ROOM", get_rm_coord(), "GET DIRECTIONS",new_rooms, "DIR",dir)
+    return new_rooms
 
+def mark_visited(visited, rm_coord, traveled_dir=None):
+    rm_exits = player.currentRoom.getExits()
+    room_exits = {}
+    if rm_coord not in visited:
+        for dir in rm_exits:
+            room_exits[dir] = False
+        if traveled_dir:
+            room_exits[traveled_dir] = True
+        visited[rm_coord] = room_exits
+    else:
+        visited[rm_coord][traveled_dir] = True
+
+def get_rm_coord():
+    return player.currentRoom.getID()
+
+def traverse_map():
+    rev_dir = { "n":"s", "s":"n", "w":"e", "e":"w" }
+    new_rooms = []      # track new rooms dir
+    traveled = []
+    traveled_ids = []
+    visited = {}     # track rooms visited
+
+    get_directions(new_rooms)
+    counter = 0
+    rm_coord = get_rm_coord()
+    # print("StartRoom", rm_coord)
+    reverse = False
+    traveled_ids.append(get_rm_coord())
+
+    while len(new_rooms) > 0:
+        # If all rooms reached quit
+        # print("COUNTER",counter)
+        if counter == 400:
+            print("QUIT")
+            break
+        if len(visited) == len(roomGraph):
+            print("new_rooms",new_rooms)
+            print("all rooms done"); new_rooms = []; break
+
+        dir = new_rooms.pop() # get next direction to travel
+        rm_coord = get_rm_coord()
+        if 371 <= counter:
+            # print("visited", visited[rm_coord][dir])
+            print(f"\\\\\ {get_rm_coord()} | DIRECTIONS: {new_rooms}")
+            # print(visited[rm_coord])
+            print(visited.keys())
+        if rm_coord in visited and visited[rm_coord][dir]:
+            mark_visited(visited, rm_coord, dir)
+            player.travel(dir, False)
+            traversalPath.append(dir)
+            # print(f"\\\\\ {get_rm_coord()} | DIRECTIONS: {new_rooms}")
+            reverse = True
+        elif rm_coord in visited and reverse: 
+            mark_visited(visited, rm_coord, dir)
+            reverse = False
+            player.travel(dir, False)
+            get_directions(new_rooms, dir)
+            mark_visited(visited, get_rm_coord(), rev_dir[dir])
+            # print(f"___ {get_rm_coord()} | DIRECTIONS: {new_rooms}")
+            traversalPath.append(dir)
+        else:
+            mark_visited(visited, rm_coord, dir)
+            player.travel(dir, False)
+            get_directions(new_rooms, dir)
+            # print(f"CUR {get_rm_coord()} | DIRECTIONS: {new_rooms}")
+            mark_visited(visited, get_rm_coord(), rev_dir[dir])
+            traveled.append(dir)
+            traversalPath.append(dir)
+        traveled_ids.append(get_rm_coord())
+        counter += 1
+    print("path",traveled_ids)
+    print("traversalPath",traversalPath)
+
+
+traverse_map()
 
 # TRAVERSAL TEST
 visited_rooms = set()

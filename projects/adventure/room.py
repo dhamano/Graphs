@@ -57,3 +57,5 @@ class Room:
             return None
     def getCoords(self):
         return [self.x, self.y]
+    def getID(self):
+        return self.id
